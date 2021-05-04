@@ -16,29 +16,30 @@ pclassFareMean = tbl[tbl["Fare"] > 0].groupby(["Pclass"])["Fare"].mean()
 for pclass, fare in pclassFareMean.iteritems():
     tbl.loc[(tbl["Pclass"] == pclass) & (tbl["Fare"].isnull()), "Fare"] = fare
 
-# Add Title column
+# Create and reduce Title column
+titleDictionary = {"Master": "Master", "Miss": "Miss", "Mlle": "Miss", "Mme": "Ms", "Ms": "Ms", "Mr": "Mr",
+                   "Countess": "Ms", "Mrs": "Ms", "Jonkheer": "Mr", "Don": "Mr", "Dr": "Mr", "Rev": "Mr", "Lady": "Ms",
+                   "Major": "Old", "Sir": "Old", "Col": "Old", "Capt": "Old"}
 tbl["Title"] = tbl["Name"].str.extract("([A-Za-z]+)\.", expand=True)
+tbl = tbl.replace({"Title": titleDictionary})
 
 # Fill missing Age based on mean age for each title
 titleAgeMean = tbl[tbl["Age"] > 0].groupby("Title")["Age"].mean()
 for title, age in titleAgeMean.iteritems():
     tbl.loc[(tbl["Title"] == title) & (tbl["Age"].isnull()), "Age"] = age
 
-# Add new feature IsAlone, HasCabin
-tbl["IsAlone"] = tbl["SibSp"] + tbl["Parch"] == 0
-tbl["HasCabin"] = tbl["Cabin"].isnull() != True
-
-# print(tbl.to_string())
+# Add new features IsAlone, HasCabin
+tbl["IsAlone"] = (tbl["SibSp"] + tbl["Parch"] == 0) * 1
+tbl["HasCabin"] = (tbl["Cabin"].isnull() != True) * 1
 
 # Build dummy columns
 tbl = pandas.get_dummies(tbl, columns=["Sex", "Pclass", "Embarked", "Title"], drop_first=False)
 
 # Drop extra columns
-tbl = tbl.drop(["PassengerId", "Name", "Ticket", "Cabin"], axis=1)
+tbl = tbl.drop(["PassengerId", "Name", "Ticket", "Cabin", "Sex_male"], axis=1)
 
 # Normalize columns
-for column in ["Age", "SibSp", "Parch", "Fare"]:
-    tbl[column] = ((tbl[column] - tbl[column].min()) / (tbl[column].max() - tbl[column].min())) * 1
+tbl = ((tbl - tbl.min()) / (tbl.max() - tbl.min()))
 
 # print(tbl.to_string())
 # print(tbl.corr().to_string())
@@ -66,18 +67,16 @@ for depth in range(1, 20):
     score_train = classifier.score(X_train, Y_train)
     score_test = classifier.score(X_test, Y_test)
     print(f"Decision Tree Train (depth={depth}): {score_train},  Test: {score_test}")
+print("-------------------------------------------------------")
 
 classifier = sklearn.tree.DecisionTreeClassifier(max_depth=15)
 classifier.fit(X_train, Y_train.values.ravel())
-print("-------------------------------------------------------")
 
 # Get dot-data list
-feature_names = ["Age", "SibSp", "Parch", "Fare", "IsAlone", "HasCabin", "Sex_female", "Sex_male", "Pclass_1",
-                 "Pclass_2", "Pclass_3", "Embarked_C", "Embarked_Q", "Embarked_S", "Title_Capt", "Title_Col",
-                 "Title_Countess", "Title_Don", "Title_Dr", "Title_Jonkheer", "Title_Lady", "Title_Major",
-                 "Title_Master", "Title_Miss", "Title_Mlle", "Title_Mme", "Title_Mr", "Title_Mrs", "Title_Ms",
-                 "Title_Rev", "Title_Sir"]
+feature_names = ["Age", "SibSp", "Parch", "Fare", "IsAlone", "HasCabin", "Sex_female", "Pclass_1",
+                 "Pclass_2", "Pclass_3", "Embarked_C", "Embarked_Q", "Embarked_S",
+                 "Title_Master", "Title_Miss", "Title_Mr", "Title_Ms", "Title_Old"]
 dot_data = sklearn.tree.export_graphviz(classifier, feature_names=feature_names, out_file=None, filled=True)
 
 graph = graphviz.Source(dot_data, format="svg")
-# graph.render(filename="Titanic")
+graph.render(filename="Titanic")
