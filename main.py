@@ -2,6 +2,7 @@ import numpy
 import pandas
 import sklearn.neighbors
 import sklearn.tree
+import graphviz
 
 # Set random seed to get stable results for debugging
 numpy.random.seed(5)
@@ -65,4 +66,18 @@ for depth in range(1, 20):
     score_train = classifier.score(X_train, Y_train)
     score_test = classifier.score(X_test, Y_test)
     print(f"Decision Tree Train (depth={depth}): {score_train},  Test: {score_test}")
+
+classifier = sklearn.tree.DecisionTreeClassifier(max_depth=15)
+classifier.fit(X_train, Y_train.values.ravel())
 print("-------------------------------------------------------")
+
+# Get dot-data list
+feature_names = ["Age", "SibSp", "Parch", "Fare", "IsAlone", "HasCabin", "Sex_female", "Sex_male", "Pclass_1",
+                 "Pclass_2", "Pclass_3", "Embarked_C", "Embarked_Q", "Embarked_S", "Title_Capt", "Title_Col",
+                 "Title_Countess", "Title_Don", "Title_Dr", "Title_Jonkheer", "Title_Lady", "Title_Major",
+                 "Title_Master", "Title_Miss", "Title_Mlle", "Title_Mme", "Title_Mr", "Title_Mrs", "Title_Ms",
+                 "Title_Rev", "Title_Sir"]
+dot_data = sklearn.tree.export_graphviz(classifier, feature_names=feature_names, out_file=None, filled=True)
+
+graph = graphviz.Source(dot_data, format="svg")
+# graph.render(filename="Titanic")
