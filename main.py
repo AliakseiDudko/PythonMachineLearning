@@ -1,6 +1,7 @@
 import numpy
 import pandas
 import sklearn.neighbors
+import sklearn.tree
 
 # Set random seed to get stable results for debugging
 numpy.random.seed(5)
@@ -54,3 +55,14 @@ score_train = alg.score(X_train, Y_train)
 score_test = alg.score(X_test, Y_test)
 print("-------------------------------------------------------")
 print(f"KNN Train: {score_train},  Test: {score_test}")
+
+# Decision Tree algorithm
+print("-------------------------------------------------------")
+for depth in range(1, 20):
+    classifier = sklearn.tree.DecisionTreeClassifier(max_depth=depth)
+    classifier.fit(X_train, Y_train.values.ravel())
+
+    score_train = classifier.score(X_train, Y_train)
+    score_test = classifier.score(X_test, Y_test)
+    print(f"Decision Tree Train (depth={depth}): {score_train},  Test: {score_test}")
+print("-------------------------------------------------------")
