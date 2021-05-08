@@ -13,9 +13,9 @@ tbl = pandas.read_csv("data.csv")
 tbl["Embarked"] = tbl["Embarked"].fillna(tbl["Embarked"].value_counts().index[0])
 
 # Fill missing Fare based on mean ticket price for each Pclass
-pclassFareMean = tbl[tbl["Fare"] > 0].groupby(["Pclass"])["Fare"].mean()
-for pclass, fare in pclassFareMean.iteritems():
-    tbl.loc[(tbl["Pclass"] == pclass) & (tbl["Fare"].isnull()), "Fare"] = fare
+pclassFareMean = tbl[tbl["Fare"] > 0].groupby(["Pclass", "Embarked"])["Fare"].mean()
+for item, fare in pclassFareMean.iteritems():
+    tbl.loc[(tbl["Pclass"] == item[0]) & (tbl["Embarked"] == item[1]) & (tbl["Fare"].isnull()), "Fare"] = fare
 
 # Create and reduce Title column
 titleDictionary = {"Master": "Master", "Miss": "Miss", "Mlle": "Miss", "Mme": "Ms", "Ms": "Ms", "Mr": "Mr",
@@ -74,21 +74,21 @@ classifier = sklearn.tree.DecisionTreeClassifier(max_depth=15)
 classifier.fit(X_train, Y_train.values.ravel())
 
 # Draw using graphviz
-feature_names = ["Age", "SibSp", "Parch", "Fare", "IsAlone", "HasCabin", "Sex_female", "Pclass_1",
-                 "Pclass_2", "Pclass_3", "Embarked_C", "Embarked_Q", "Embarked_S",
-                 "Title_Master", "Title_Miss", "Title_Mr", "Title_Ms", "Title_Old"]
-dot_data = sklearn.tree.export_graphviz(classifier,
-                                        feature_names=feature_names,
-                                        class_names=["Drowned", "Survived"],
-                                        out_file=None,
-                                        filled=True)
-graph = graphviz.Source(dot_data, format="svg")
-graph.render(filename="Titanic_Graphviz")
+# feature_names = ["Age", "SibSp", "Parch", "Fare", "IsAlone", "HasCabin", "Sex_female", "Pclass_1",
+#                  "Pclass_2", "Pclass_3", "Embarked_C", "Embarked_Q", "Embarked_S",
+#                  "Title_Master", "Title_Miss", "Title_Mr", "Title_Ms", "Title_Old"]
+# dot_data = sklearn.tree.export_graphviz(classifier,
+#                                         feature_names=feature_names,
+#                                         class_names=["Drowned", "Survived"],
+#                                         out_file=None,
+#                                         filled=True)
+# graph = graphviz.Source(dot_data, format="svg")
+# graph.render(filename="Titanic_Graphviz")
 
 # Draw using dtreeviz
-viz = dtreeviz(classifier,
-               tbl[feature_names],
-               tbl["Survived"],
-               feature_names=feature_names,
-               class_names=["Drowned", "Survived"])
-viz.save("Titanic_Dtreeviz.svg")
+# viz = dtreeviz(classifier,
+#                tbl[feature_names],
+#                tbl["Survived"],
+#                feature_names=feature_names,
+#                class_names=["Drowned", "Survived"])
+# viz.save("Titanic_Dtreeviz.svg")
