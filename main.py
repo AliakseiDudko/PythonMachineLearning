@@ -1,8 +1,9 @@
+import graphviz
 import numpy
 import pandas
 import sklearn.neighbors
 import sklearn.tree
-import graphviz
+from dtreeviz.trees import dtreeviz
 
 # Set random seed to get stable results for debugging
 numpy.random.seed(5)
@@ -72,11 +73,22 @@ print("-------------------------------------------------------")
 classifier = sklearn.tree.DecisionTreeClassifier(max_depth=15)
 classifier.fit(X_train, Y_train.values.ravel())
 
-# Get dot-data list
+# Draw using graphviz
 feature_names = ["Age", "SibSp", "Parch", "Fare", "IsAlone", "HasCabin", "Sex_female", "Pclass_1",
                  "Pclass_2", "Pclass_3", "Embarked_C", "Embarked_Q", "Embarked_S",
                  "Title_Master", "Title_Miss", "Title_Mr", "Title_Ms", "Title_Old"]
-dot_data = sklearn.tree.export_graphviz(classifier, feature_names=feature_names, out_file=None, filled=True)
-
+dot_data = sklearn.tree.export_graphviz(classifier,
+                                        feature_names=feature_names,
+                                        class_names=["Drowned", "Survived"],
+                                        out_file=None,
+                                        filled=True)
 graph = graphviz.Source(dot_data, format="svg")
-graph.render(filename="Titanic")
+graph.render(filename="Titanic_Graphviz")
+
+# Draw using dtreeviz
+viz = dtreeviz(classifier,
+               tbl[feature_names],
+               tbl["Survived"],
+               feature_names=feature_names,
+               class_names=["Drowned", "Survived"])
+viz.save("Titanic_Dtreeviz.svg")
