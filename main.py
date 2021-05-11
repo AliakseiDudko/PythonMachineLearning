@@ -4,6 +4,7 @@ import pandas
 import sklearn.neighbors
 import sklearn.tree
 import dtreeviz.trees as dtree
+import matplotlib.pyplot as plt
 
 # Set random seed to get stable results for debugging
 numpy.random.seed(5)
@@ -29,9 +30,12 @@ titleAgeMean = tbl[tbl["Age"] > 0].groupby("Title")["Age"].mean()
 for title, age in titleAgeMean.iteritems():
     tbl.loc[(tbl["Title"] == title) & (tbl["Age"].isnull()), "Age"] = age
 
-# Add new features IsAlone, HasCabin
+# Show Age histogram
+# tbl["Age"].hist()
+# plt.show()
+
+# Add new features IsAlone
 tbl["IsAlone"] = (tbl["SibSp"] + tbl["Parch"] == 0) * 1
-tbl["HasCabin"] = (tbl["Cabin"].isnull() != True) * 1
 
 # Build dummy columns
 tbl = pandas.get_dummies(tbl, columns=["Sex", "Pclass", "Embarked", "Title"], drop_first=False)
@@ -74,7 +78,7 @@ classifier = sklearn.tree.DecisionTreeClassifier(max_depth=15)
 classifier.fit(X_train, Y_train.values.ravel())
 
 # Draw using graphviz
-# feature_names = ["Age", "SibSp", "Parch", "Fare", "IsAlone", "HasCabin", "Sex_female", "Pclass_1",
+# feature_names = ["Age", "SibSp", "Parch", "Fare", "IsAlone", "Sex_female", "Pclass_1",
 #                  "Pclass_2", "Pclass_3", "Embarked_C", "Embarked_Q", "Embarked_S",
 #                  "Title_Master", "Title_Miss", "Title_Mr", "Title_Ms", "Title_Senior"]
 # dot_data = sklearn.tree.export_graphviz(classifier,
