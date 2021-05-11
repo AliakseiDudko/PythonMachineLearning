@@ -3,7 +3,7 @@ import numpy
 import pandas
 import sklearn.neighbors
 import sklearn.tree
-from dtreeviz.trees import dtreeviz
+import dtreeviz.trees as dtree
 
 # Set random seed to get stable results for debugging
 numpy.random.seed(5)
@@ -20,7 +20,7 @@ for item, fare in pclassFareMean.iteritems():
 # Create and reduce Title column
 titleDictionary = {"Master": "Master", "Miss": "Miss", "Mlle": "Miss", "Mme": "Ms", "Ms": "Ms", "Mr": "Mr",
                    "Countess": "Ms", "Mrs": "Ms", "Jonkheer": "Mr", "Don": "Mr", "Dr": "Mr", "Rev": "Mr", "Lady": "Ms",
-                   "Major": "Old", "Sir": "Old", "Col": "Old", "Capt": "Old"}
+                   "Major": "Senior", "Sir": "Senior", "Col": "Senior", "Capt": "Senior"}
 tbl["Title"] = tbl["Name"].str.extract("([A-Za-z]+)\.", expand=True)
 tbl = tbl.replace({"Title": titleDictionary})
 
@@ -76,7 +76,7 @@ classifier.fit(X_train, Y_train.values.ravel())
 # Draw using graphviz
 # feature_names = ["Age", "SibSp", "Parch", "Fare", "IsAlone", "HasCabin", "Sex_female", "Pclass_1",
 #                  "Pclass_2", "Pclass_3", "Embarked_C", "Embarked_Q", "Embarked_S",
-#                  "Title_Master", "Title_Miss", "Title_Mr", "Title_Ms", "Title_Old"]
+#                  "Title_Master", "Title_Miss", "Title_Mr", "Title_Ms", "Title_Senior"]
 # dot_data = sklearn.tree.export_graphviz(classifier,
 #                                         feature_names=feature_names,
 #                                         class_names=["Drowned", "Survived"],
@@ -86,9 +86,9 @@ classifier.fit(X_train, Y_train.values.ravel())
 # graph.render(filename="Titanic_Graphviz")
 
 # Draw using dtreeviz
-# viz = dtreeviz(classifier,
-#                tbl[feature_names],
-#                tbl["Survived"],
-#                feature_names=feature_names,
-#                class_names=["Drowned", "Survived"])
+# viz = dtree.dtreeviz(classifier,
+#                      tbl[feature_names],
+#                      tbl["Survived"],
+#                      feature_names=feature_names,
+#                      class_names=["Drowned", "Survived"])
 # viz.save("Titanic_Dtreeviz.svg")
