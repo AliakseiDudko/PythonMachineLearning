@@ -1,8 +1,10 @@
 import numpy
 import pandas
-import sklearn.neighbors
-import sklearn.tree
 import sklearn.linear_model
+
+# Features
+ticketGroupFeature = 1
+deckFeature = 1
 
 # Set random seed to get stable results for debugging
 numpy.random.seed(5)
@@ -31,14 +33,24 @@ titleAgeMean = tbl[tbl["Age"] > 0].groupby("Title")["Age"].mean()
 for title, age in titleAgeMean.iteritems():
     tbl.loc[(tbl["Title"] == title) & (tbl["Age"].isnull()), "Age"] = age
 
+# Add TicketGroupSize
+if ticketGroupFeature:
+    ticketsCount = tbl.groupby(tbl["Ticket"])["Ticket"].count()
+    for ticket, count in ticketsCount.iteritems():
+        tbl.loc[tbl["Ticket"] == ticket, "TicketGroupSize"] = count
+
+# Add deck feature
+if deckFeature:
+    tbl["Deck"] = tbl["Cabin"].str.extract("([A-Z])", expand=True)
+    tbl["Deck"] = tbl["Deck"].fillna("N/A")
+
 # Build dummy columns
 tbl = pandas.get_dummies(tbl, columns=["Sex", "Pclass", "Embarked", "Title"], drop_first=False)
+if deckFeature:
+    tbl = pandas.get_dummies(tbl, columns=["Deck"], drop_first=False)
 
 # Drop extra columns
 tbl = tbl.drop(["PassengerId", "Name", "Ticket", "Cabin", "Sex_male"], axis=1)
-
-# Normalize columns
-tbl = ((tbl - tbl.min()) / (tbl.max() - tbl.min()))
 
 # print(tbl.to_string())
 # print(tbl.corr().to_string())

@@ -34,6 +34,10 @@ for title, age in titleAgeMean.iteritems():
 # tbl["Age"].hist()
 # plt.show()
 
+# Show Survived by Title histogram
+# tbl["Survived"].groupby(tbl["Title"]).mean().plot(kind='bar')
+# plt.show()
+
 # Add new features IsAlone
 tbl["IsAlone"] = (tbl["SibSp"] + tbl["Parch"] == 0) * 1
 
