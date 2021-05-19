@@ -1,16 +1,17 @@
 import graphviz
 import numpy
 import pandas
-import sklearn.neighbors
-import sklearn.tree
 import dtreeviz.trees as dtree
 import matplotlib.pyplot as plt
 import knnClassifier
+import treeClassifier
+import sklearn
 
 best_knn_score_train, best_knn_score_test = knnClassifier.get_knn_classifier_score(title_feature=True, family_size_feature=True, deck_feature=True)
-print(f"Best KNN train score: {best_knn_score_train}, test score: {best_knn_score_test}")
-# KNN best test score: (0.7829341317365269, 0.8385650224215246)
+print(f"Best KNN train score:           {best_knn_score_train}, test score: {best_knn_score_test}")
 
+best_tree_score_train, best_tree_score_train = treeClassifier.get_tree_classifier_score(4, title_feature=True, family_size_feature=True)
+print(f"Best decision tree train score: {best_tree_score_train}, test score: {best_tree_score_train}")
 
 # Set random seed to get stable results for debugging
 numpy.random.seed(5)
@@ -61,25 +62,6 @@ tbl = ((tbl - tbl.min()) / (tbl.max() - tbl.min()))
 
 X = tbl.drop(["Survived"], axis=1)
 Y = tbl[["Survived"]]
-
-X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split(X, Y)
-print("-------------------------------------------------------")
-
-# Decision Tree algorithm
-# for depth in range(1, 20):
-#     treeClassifier = sklearn.tree.DecisionTreeClassifier(max_depth=depth)
-#     treeClassifier.fit(X_train, Y_train.values.ravel())
-#
-#     score_train = treeClassifier.score(X_train, Y_train)
-#     score_test = treeClassifier.score(X_test, Y_test)
-#     print(f"Decision Tree Train (depth={depth}): {score_train}, Test: {score_test}")
-# print("-------------------------------------------------------")
-treeClassifier = sklearn.tree.DecisionTreeClassifier(max_depth=15)
-treeClassifier.fit(X_train, Y_train.values.ravel())
-score_train = treeClassifier.score(X_train, Y_train)
-score_test = treeClassifier.score(X_test, Y_test)
-print(f"Decision Tree Train (depth={15}): {score_train}, Test: {score_test}")
-print("-------------------------------------------------------")
 
 # Draw using graphviz
 # feature_names = ["Age", "SibSp", "Parch", "Fare", "IsAlone", "Sex_female", "Pclass_1",
