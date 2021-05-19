@@ -3,7 +3,8 @@ import pandas
 import sklearn.linear_model
 
 # Features
-ticketGroupFeature = 1
+ticketGroupSizeFeature = 1
+familySizeFeature = 1
 deckFeature = 1
 
 # Set random seed to get stable results for debugging
@@ -34,12 +35,18 @@ for title, age in titleAgeMean.iteritems():
     tbl.loc[(tbl["Title"] == title) & (tbl["Age"].isnull()), "Age"] = age
 
 # Add TicketGroupSize
-if ticketGroupFeature:
+if ticketGroupSizeFeature:
     ticketsCount = tbl.groupby(tbl["Ticket"])["Ticket"].count()
     for ticket, count in ticketsCount.iteritems():
         tbl.loc[tbl["Ticket"] == ticket, "TicketGroupSize"] = count
 
-# Add deck feature
+# Add FamilySize
+if familySizeFeature:
+    tbl.loc[tbl["Parch"] + tbl["SibSp"] == 0, "FamilySize"] = "Alone"
+    tbl.loc[(tbl["Parch"] + tbl["SibSp"] >= 1) & (tbl["Parch"] + tbl["SibSp"] <= 3), "FamilySize"] = "Middle"
+    tbl.loc[tbl["Parch"] + tbl["SibSp"] > 3, "FamilySize"] = "Big"
+
+# Add Deck
 if deckFeature:
     tbl["Deck"] = tbl["Cabin"].str.extract("([A-Z])", expand=True)
     tbl["Deck"] = tbl["Deck"].fillna("N/A")
@@ -48,9 +55,13 @@ if deckFeature:
 tbl = pandas.get_dummies(tbl, columns=["Sex", "Pclass", "Embarked", "Title"], drop_first=False)
 if deckFeature:
     tbl = pandas.get_dummies(tbl, columns=["Deck"], drop_first=False)
+if familySizeFeature:
+    tbl = pandas.get_dummies(tbl, columns=["FamilySize"], drop_first=False)
 
 # Drop extra columns
 tbl = tbl.drop(["PassengerId", "Name", "Ticket", "Cabin", "Sex_male"], axis=1)
+if familySizeFeature:
+    tbl = tbl.drop(["Parch", "SibSp"], axis=1)
 
 # print(tbl.to_string())
 # print(tbl.corr().to_string())
