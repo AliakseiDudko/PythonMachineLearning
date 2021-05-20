@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import knnClassifier
 import treeClassifier
 import naiveBayes
+import logisticRegression
 
 # Set seed if it is required to get stable results for debugging
 # np.random.seed(5)
@@ -19,6 +20,10 @@ import naiveBayes
 # print(f"Best naive Bayes   test score: {best_bayes_score}, settings: {best_bayes_settings}")
 # # Best naive Bayes   test score: 0.8221856287425147, settings: {'fill_embarked': False, 'fill_age': False, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': True, 'deck_feature': False}
 
+# best_logistic_score, best_logistic_settings = logisticRegression.find_best_logistic_classifier_score()
+# print(f"Best logistic reg. test score: {best_logistic_score}, settings: {best_logistic_settings}")
+# # Best logistic reg. test score: 0.8334730538922153, settings: {'fill_embarked': True, 'fill_age': True, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': True}
+
 knn_settings = {'fill_embarked': False, 'fill_age': True, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': False}
 knn_score_train, knn_score_test = knnClassifier.get_knn_classifier_score(knn_settings)
 print(f"KNN           train score: {knn_score_train}, test score: {knn_score_test}")
@@ -30,6 +35,10 @@ print(f"Decision tree train score: {tree_score_train}, test score: {tree_score_t
 bayes_settings = {'fill_embarked': False, 'fill_age': False, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': True, 'deck_feature': False}
 best_bayes_score_train, best_bayes_score_test = naiveBayes.get_bayes_classifier_score(bayes_settings)
 print(f"Naive Bayes   train score: {best_bayes_score_train}, test score: {best_bayes_score_test}")
+
+logistic_settings = {'fill_embarked': True, 'fill_age': True, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': True}
+best_logistic_score_train, best_logistic_score_test = logisticRegression.get_logistic_classifier_score(logistic_settings)
+print(f"Logistic Reg. train score: {best_logistic_score_train}, test score: {best_logistic_score_test}")
 
 # Show Age histogram
 # tbl["Age"].hist()

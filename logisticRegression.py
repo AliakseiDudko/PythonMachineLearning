@@ -1,81 +1,49 @@
-import numpy
-import pandas
 import sklearn.linear_model
+import featureEngineering
 
-# Features
-ticketGroupSizeFeature = 1
-familySizeFeature = 1
-deckFeature = 1
 
-# Set random seed to get stable results for debugging
-numpy.random.seed(5)
+def get_data_frame_logistic_classifier_score(tbl) -> (float, float):
+    train_data, test_data, train_survived_data, test_survived_data = featureEngineering.split_data_frame(tbl)
 
-# Read data to DataFrame
-tbl = pandas.read_csv("data.csv")
+    logistic_classifier = sklearn.linear_model.LogisticRegression(penalty="l2",
+                                                                  solver="newton-cg",
+                                                                  class_weight="balanced")
+    logistic_classifier.fit(train_data, train_survived_data.values.ravel())
+    score_train = logistic_classifier.score(train_data, train_survived_data)
+    score_test = logistic_classifier.score(test_data, test_survived_data)
 
-# Fill missing Embarked with most frequent value
-tbl["Embarked"] = tbl["Embarked"].fillna(tbl["Embarked"].value_counts().index[0])
+    return score_train, score_test
 
-# Fill missing Fare based on mean ticket price for each Pclass
-pclassFareMean = tbl[tbl["Fare"] > 0].groupby(["Pclass", "Embarked"])["Fare"].mean()
-for item, fare in pclassFareMean.iteritems():
-    tbl.loc[(tbl["Pclass"] == item[0]) & (tbl["Embarked"] == item[1]) & (tbl["Fare"].isnull()), "Fare"] = fare
 
-# Create and reduce Title column
-titleDictionary = {"Master": "Master", "Mr": "Mr", "Jonkheer": "Mr", "Don": "Mr",
-                   "Miss": "Miss", "Mlle": "Miss",  "Mme": "Ms", "Ms": "Ms", "Mrs": "Ms",
-                   "Countess": "Other", "Dr": "Other", "Rev": "Other", "Lady": "Other",
-                   "Major": "Other", "Sir": "Other", "Col": "Other", "Capt": "Other"}
-tbl["Title"] = tbl["Name"].str.extract("([A-Za-z]+)\.", expand=True)
-tbl = tbl.replace({"Title": titleDictionary})
+def get_logistic_classifier_score(settings) -> (float, float):
+    # Prepare DataFrame
+    tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
 
-# Fill missing Age based on mean age for each title
-titleAgeMean = tbl[tbl["Age"] > 0].groupby("Title")["Age"].mean()
-for title, age in titleAgeMean.iteritems():
-    tbl.loc[(tbl["Title"] == title) & (tbl["Age"].isnull()), "Age"] = age
+    return get_data_frame_logistic_classifier_score(tbl)
 
-# Add TicketGroupSize
-if ticketGroupSizeFeature:
-    ticketsCount = tbl.groupby(tbl["Ticket"])["Ticket"].count()
-    for ticket, count in ticketsCount.iteritems():
-        tbl.loc[tbl["Ticket"] == ticket, "TicketGroupSize"] = count
 
-# Add FamilySize
-if familySizeFeature:
-    tbl.loc[tbl["Parch"] + tbl["SibSp"] == 0, "FamilySize"] = "Alone"
-    tbl.loc[(tbl["Parch"] + tbl["SibSp"] >= 1) & (tbl["Parch"] + tbl["SibSp"] <= 3), "FamilySize"] = "Middle"
-    tbl.loc[tbl["Parch"] + tbl["SibSp"] > 3, "FamilySize"] = "Big"
+def find_best_logistic_classifier_score() -> (float, dict):
+    best_test_score = 0.0
+    best_settings = None
+    attempt_count = 100
 
-# Add Deck
-if deckFeature:
-    tbl["Deck"] = tbl["Cabin"].str.extract("([A-Z])", expand=True)
-    tbl["Deck"] = tbl["Deck"].fillna("N/A")
+    for settings_seed in range(0, featureEngineering.get_settings_variations_count()):
+        # Get variation of features
+        settings = featureEngineering.get_settings_variation(settings_seed)
 
-# Build dummy columns
-tbl = pandas.get_dummies(tbl, columns=["Sex", "Pclass", "Embarked", "Title"], drop_first=False)
-if deckFeature:
-    tbl = pandas.get_dummies(tbl, columns=["Deck"], drop_first=False)
-if familySizeFeature:
-    tbl = pandas.get_dummies(tbl, columns=["FamilySize"], drop_first=False)
+        # Prepare DataFrame
+        tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
 
-# Drop extra columns
-tbl = tbl.drop(["PassengerId", "Name", "Ticket", "Cabin", "Sex_male"], axis=1)
-if familySizeFeature:
-    tbl = tbl.drop(["Parch", "SibSp"], axis=1)
+        test_score_sum = 0
+        for attempt in range(0, attempt_count):
+            # Get results of classification
+            score_test, score_test = get_data_frame_logistic_classifier_score(tbl)
+            test_score_sum += score_test
 
-# print(tbl.to_string())
-# print(tbl.corr().to_string())
+        score_test_avg = test_score_sum / attempt_count
+        if best_test_score < score_test_avg:
+            best_test_score = score_test_avg
+            best_settings = settings
+            print(f"Logistic regression best configuration: {best_test_score}, settings: {best_settings}")
 
-X = tbl.drop(["Survived"], axis=1)
-Y = tbl[["Survived"]]
-
-X_train, X_test, Y_train, Y_test = sklearn.model_selection.train_test_split(X, Y)
-print("-------------------------------------------------------")
-
-# Logistic regression algorithm
-classifier = sklearn.linear_model.LogisticRegression(penalty="l2", solver="newton-cg", class_weight="balanced")
-classifier.fit(X_train, Y_train.values.ravel())
-score_train = classifier.score(X_train, Y_train)
-score_test = classifier.score(X_test, Y_test)
-print(f"Logistic regression Train: {score_train},  Test: {score_test}")
-print("-------------------------------------------------------")
+    return best_test_score, best_settings
