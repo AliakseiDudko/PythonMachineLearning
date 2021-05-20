@@ -13,59 +13,35 @@ def get_data_frame_knn_classifier_score(tbl) -> (float, float):
     return score_train, score_test
 
 
-def get_knn_classifier_score(fill_embarked=False,
-                             fill_age=False,
-                             fill_fare=False,
-                             title_feature=False,
-                             ticket_group_feature=False,
-                             family_size_feature=False,
-                             deck_feature=False) -> (float, float):
+def get_knn_classifier_score(settings) -> (float, float):
     # Prepare DataFrame
-    tbl = featureEngineering.get_featured_data_frame("data.csv",
-                                                     True,
-                                                     fill_embarked,
-                                                     fill_age,
-                                                     fill_fare,
-                                                     title_feature,
-                                                     ticket_group_feature,
-                                                     family_size_feature,
-                                                     deck_feature)
+    tbl = featureEngineering.get_featured_data_frame("data.csv", settings, True)
 
     return get_data_frame_knn_classifier_score(tbl)
 
 
-def find_best_knn_classifier_score() -> float:
-    best_train_score = 0.0
+def find_best_knn_classifier_score() -> (float, dict):
+    best_test_score = 0.0
+    best_settings = None
     attempt_count = 100
 
-    for settings in range(0, 128):
+    for settings_seed in range(0, featureEngineering.get_settings_variations_count()):
         # Get variation of features
-        fill_embarked, fill_age, fill_fare, title_feature, ticket_group_feature, family_size_feature, deck_feature = \
-            featureEngineering.get_features_vector(settings)
+        settings = featureEngineering.get_settings_variation(settings_seed)
 
         # Prepare DataFrame
-        tbl = featureEngineering.get_featured_data_frame("data.csv",
-                                                         True,
-                                                         fill_embarked,
-                                                         fill_age,
-                                                         fill_fare,
-                                                         title_feature,
-                                                         ticket_group_feature,
-                                                         family_size_feature,
-                                                         deck_feature)
-        # Normalize columns
-        tbl = ((tbl - tbl.min()) / (tbl.max() - tbl.min()))
+        tbl = featureEngineering.get_featured_data_frame("data.csv", settings, True)
 
-        train_score_sum = 0
+        test_score_sum = 0
         for attempt in range(0, attempt_count):
             # Get results of classification
             score_train, score_test = get_data_frame_knn_classifier_score(tbl)
-            train_score_sum += score_train
+            test_score_sum += score_test
 
-        score_train_avg = train_score_sum / attempt_count
-        if best_train_score < score_train_avg:
-            best_train_score = score_train_avg
-            print(
-                f"KNN best configuration: {best_train_score}, settings: {featureEngineering.get_features_vector(settings)}")
+        score_test_avg = test_score_sum / attempt_count
+        if best_test_score < score_test_avg:
+            best_test_score = score_test_avg
+            best_settings = settings
+            print(f"KNN best configuration: {best_test_score}, settings: {best_settings}")
 
-    return best_train_score
+    return best_test_score, best_settings

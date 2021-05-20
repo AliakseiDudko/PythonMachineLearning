@@ -13,49 +13,27 @@ def get_data_frame_tree_classifier_score(max_depth, tbl) -> (float, float):
     return score_train, score_test
 
 
-def get_tree_classifier_score(max_depth,
-                              fill_embarked=False,
-                              fill_age=False,
-                              fill_fare=False,
-                              title_feature=False,
-                              ticket_group_feature=False,
-                              family_size_feature=False,
-                              deck_feature=False) -> (float, float):
+def get_tree_classifier_score(settings) -> (float, float):
     # Prepare DataFrame
-    tbl = featureEngineering.get_featured_data_frame("data.csv",
-                                                     False,
-                                                     fill_embarked,
-                                                     fill_age,
-                                                     fill_fare,
-                                                     title_feature,
-                                                     ticket_group_feature,
-                                                     family_size_feature,
-                                                     deck_feature)
+    tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
 
-    return get_data_frame_tree_classifier_score(max_depth, tbl)
+    return get_data_frame_tree_classifier_score(settings["max_depth"], tbl)
 
 
-def find_best_tree_classifier_score(depth_min, depth_max) -> float:
-    best_train_score = 0.0
+def find_best_tree_classifier_score(depth_min, depth_max) -> (float, dict):
+    best_test_score = 0.0
+    best_settings = None
     attempt_count = 100
 
     for depth in range(depth_min, depth_max + 1):
         print(f"Depth:{depth}")
-        for settings in range(0, 128):
+        for settings_seed in range(0, featureEngineering.get_settings_variations_count()):
             # Get variation of features
-            fill_embarked, fill_age, fill_fare, title_feature, ticket_group_feature, family_size_feature, deck_feature = \
-                featureEngineering.get_features_vector(settings)
+            settings = featureEngineering.get_settings_variation(settings_seed)
+            settings["max_depth"] = depth
 
             # Prepare DataFrame
-            tbl = featureEngineering.get_featured_data_frame("data.csv",
-                                                             False,
-                                                             fill_embarked,
-                                                             fill_age,
-                                                             fill_fare,
-                                                             title_feature,
-                                                             ticket_group_feature,
-                                                             family_size_feature,
-                                                             deck_feature)
+            tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
 
             train_score_sum = 0
             for attempt in range(0, attempt_count):
@@ -64,8 +42,9 @@ def find_best_tree_classifier_score(depth_min, depth_max) -> float:
                 train_score_sum += score_train
 
             score_train_avg = train_score_sum / attempt_count
-            if best_train_score < score_train_avg:
-                best_train_score = score_train_avg
-                print(f"Decision tree best configuration: {best_train_score}, depth:{depth}, settings: {featureEngineering.get_features_vector(settings)}")
+            if best_test_score < score_train_avg:
+                best_test_score = score_train_avg
+                best_settings = settings
+                print(f"Decision tree best configuration: {best_test_score}, settings: {best_settings}")
 
-    return best_train_score
+    return best_test_score, best_settings
