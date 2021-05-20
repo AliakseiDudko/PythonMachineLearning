@@ -1,17 +1,27 @@
 import graphviz
 import matplotlib.pyplot as plt
+import numpy as np
 import knnClassifier
 import treeClassifier
 import naiveBayes
 
-best_knn_score_train, best_knn_score_test = knnClassifier.get_knn_classifier_score(title_feature=True, family_size_feature=True, deck_feature=True)
-print(f"Best KNN           train score: {best_knn_score_train}, test score: {best_knn_score_test}")
+# Set seed if it is required to get stable results for debugging
+# np.random.seed(5)
 
-best_tree_score_train, best_tree_score_test = treeClassifier.get_tree_classifier_score(4, title_feature=True, family_size_feature=True)
-print(f"Best decision tree train score: {best_tree_score_train}, test score: {best_tree_score_test}")
+knnClassifier.find_best_knn_classifier_score()
+# KNN best configuration: 0.7979341317365269, settings: (True, True, False, True, False, True, False)
+knn_score_train, knn_score_test = knnClassifier.get_knn_classifier_score(True, True, False, True, False, True, False)
+print(f"KNN           train score: {knn_score_train}, test score: {knn_score_test}")
 
-best_bayes_score_train, best_bayes_score_test = naiveBayes.get_bayes_classifier_score(fill_age=True, title_feature=True, ticket_group_feature=True)
-print(f"Best naive Bayes   train score: {best_bayes_score_train}, test score: {best_bayes_score_test}")
+treeClassifier.find_best_tree_classifier_score(7, 7)
+# Decision tree best configuration: 0.9040718562874253, depth:7, settings: (False, True, True, False, False, True, True)
+tree_score_train, tree_score_test = treeClassifier.get_tree_classifier_score(7, False, True, True, False, False, True, True)
+print(f"Decision tree train score: {tree_score_train}, test score: {tree_score_test}")
+
+naiveBayes.find_best_bayes_classifier_score()
+# Naive Bayes best configuration: 0.8230988023952094, settings: (False, False, True, True, False, True, False)
+best_bayes_score_train, best_bayes_score_test = naiveBayes.get_bayes_classifier_score(False, False, True, True, False, True, False)
+print(f"Naive Bayes   train score: {best_bayes_score_train}, test score: {best_bayes_score_test}")
 
 # Show Age histogram
 # tbl["Age"].hist()

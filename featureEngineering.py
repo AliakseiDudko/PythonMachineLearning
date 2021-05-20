@@ -1,8 +1,11 @@
 import numpy as np
+import sklearn
 import pandas as pd
+from pandas import DataFrame
 
 
 def get_featured_data_frame(file_name,
+                            normalize=False,
                             fill_embarked=False,
                             fill_age=False,
                             fill_fare=False,
@@ -10,9 +13,6 @@ def get_featured_data_frame(file_name,
                             ticket_group_feature=False,
                             family_size_feature=False,
                             deck_feature=False):
-    # Set random seed to get stable results for debugging
-    np.random.seed(5)
-
     # Read data to DataFrame
     tbl = pd.read_csv(file_name)
 
@@ -74,7 +74,20 @@ def get_featured_data_frame(file_name,
     # Drop extra columns
     tbl = tbl.drop(["PassengerId", "Name", "Ticket", "Cabin", "Sex_male"], axis=1)
 
+    # Normalize columns
+    if normalize:
+        tbl = ((tbl - tbl.min()) / (tbl.max() - tbl.min()))
+
     return tbl
+
+
+def split_data_frame(tbl) -> (DataFrame, DataFrame, DataFrame, DataFrame):
+    data = tbl.drop(["Survived"], axis=1)
+    survived_data = tbl[["Survived"]]
+    train_data, test_data, train_survived_data, test_survived_data = \
+        sklearn.model_selection.train_test_split(data, survived_data)
+
+    return train_data, test_data, train_survived_data, test_survived_data
 
 
 def get_features_vector(i) -> (bool, bool, bool, bool, bool, bool, bool):
