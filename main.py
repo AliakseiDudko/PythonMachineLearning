@@ -5,6 +5,7 @@ import knnClassifier
 import treeClassifier
 import naiveBayes
 import logisticRegression
+import svmClassifier
 
 # Set seed if it is required to get stable results for debugging
 # np.random.seed(5)
@@ -24,6 +25,11 @@ import logisticRegression
 # best_logistic_score, best_logistic_settings = logisticRegression.find_best_logistic_classifier_score()
 # print(f"Best logistic reg. test score: {best_logistic_score}, settings: {best_logistic_settings}")
 # # Best logistic reg. test score: 0.8304932735426009, settings: {'fill_embarked': True, 'fill_age': False, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': True, 'deck_feature': False}
+#
+# best_svm_score, best_svm_settings = svmClassifier.find_best_svm_classifier_score()
+# print(f"Best SVM           test score: {best_svm_score}, settings: {best_svm_settings}")
+# # Best SVM           test score: 0.841255605381166, settings: {'fill_embarked': True, 'fill_age': False, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': False, 'deck_feature': False}
+
 
 knn_settings = {'fill_embarked': False, 'fill_age': True, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': True}
 knn_score_train, knn_score_test = knnClassifier.get_knn_classifier_score(knn_settings)
@@ -40,6 +46,11 @@ print(f"Naive Bayes   train score: {best_bayes_score_train}, test score: {best_b
 logistic_settings = {'fill_embarked': True, 'fill_age': False, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': True, 'deck_feature': False}
 best_logistic_score_train, best_logistic_score_test = logisticRegression.get_logistic_classifier_score(logistic_settings)
 print(f"Logistic Reg. train score: {best_logistic_score_train}, test score: {best_logistic_score_test}")
+
+svm_settings = {'fill_embarked': True, 'fill_age': False, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': False, 'deck_feature': False}
+best_svm_score_train, best_svm_score_test = svmClassifier.get_svm_classifier_score(svm_settings)
+print(f"SVM           train score: {best_svm_score_train}, test score: {best_svm_score_test}")
+
 
 # Show Age histogram
 # tbl["Age"].hist()
