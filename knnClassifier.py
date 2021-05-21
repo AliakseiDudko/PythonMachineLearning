@@ -23,7 +23,7 @@ def get_knn_classifier_score(settings) -> (float, float):
 def find_best_knn_classifier_score() -> (float, dict):
     best_test_score = 0.0
     best_settings = None
-    attempt_count = 100
+    attempt_count = 5
 
     for settings_seed in range(0, featureEngineering.get_settings_variations_count()):
         # Get variation of features

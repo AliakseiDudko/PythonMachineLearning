@@ -1,5 +1,6 @@
 import graphviz
 import matplotlib.pyplot as plt
+import numpy as np
 import knnClassifier
 import treeClassifier
 import naiveBayes
@@ -10,33 +11,33 @@ import logisticRegression
 
 # best_knn_score, best_knn_settings = knnClassifier.find_best_knn_classifier_score()
 # print(f"Best KNN           test score: {best_knn_score}, settings: {best_knn_settings}")
-# # Best KNN           test score: 0.7976497005988024, settings: {'fill_embarked': False, 'fill_age': True, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': False}
+# # Best KNN           test score: 0.8121076233183857, settings: {'fill_embarked': False, 'fill_age': True, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': True}
 #
-# best_tree_score, best_tree_settings = treeClassifier.find_best_tree_classifier_score(7, 7)
+# best_tree_score, best_tree_settings = treeClassifier.find_best_tree_classifier_score(1, 5)
 # print(f"Best decision tree test score: {best_tree_score}, settings: {best_tree_settings}")
-# # Best decision tree test score: 0.902949101796407, depth:7, settings: {'fill_embarked': False, 'fill_age': False, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': False, 'deck_feature': True}
+# # Best decision tree test score: 0.8493273542600898, settings: {'fill_embarked': True, 'fill_age': True, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': False, 'deck_feature': True, 'max_depth': 3}
 #
 # best_bayes_score, best_bayes_settings = naiveBayes.find_best_bayes_classifier_score()
 # print(f"Best naive Bayes   test score: {best_bayes_score}, settings: {best_bayes_settings}")
-# # Best naive Bayes   test score: 0.8221856287425147, settings: {'fill_embarked': False, 'fill_age': False, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': True, 'deck_feature': False}
-
+# # Best naive Bayes   test score: 0.8219730941704038, settings: {'fill_embarked': False, 'fill_age': False, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': False, 'deck_feature': False}
+#
 # best_logistic_score, best_logistic_settings = logisticRegression.find_best_logistic_classifier_score()
 # print(f"Best logistic reg. test score: {best_logistic_score}, settings: {best_logistic_settings}")
-# # Best logistic reg. test score: 0.8334730538922153, settings: {'fill_embarked': True, 'fill_age': True, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': True}
+# # Best logistic reg. test score: 0.8304932735426009, settings: {'fill_embarked': True, 'fill_age': False, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': True, 'deck_feature': False}
 
-knn_settings = {'fill_embarked': False, 'fill_age': True, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': False}
+knn_settings = {'fill_embarked': False, 'fill_age': True, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': True}
 knn_score_train, knn_score_test = knnClassifier.get_knn_classifier_score(knn_settings)
 print(f"KNN           train score: {knn_score_train}, test score: {knn_score_test}")
 
-tree_settings = {'max_depth': 7, 'fill_embarked': False, 'fill_age': False, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': False, 'deck_feature': True}
+tree_settings = {'fill_embarked': True, 'fill_age': True, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': False, 'deck_feature': True, 'max_depth': 3}
 tree_score_train, tree_score_test = treeClassifier.get_tree_classifier_score(tree_settings)
 print(f"Decision tree train score: {tree_score_train}, test score: {tree_score_test}")
 
-bayes_settings = {'fill_embarked': False, 'fill_age': False, 'fill_fare': True, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': True, 'deck_feature': False}
+bayes_settings = {'fill_embarked': False, 'fill_age': False, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': False, 'deck_feature': False}
 best_bayes_score_train, best_bayes_score_test = naiveBayes.get_bayes_classifier_score(bayes_settings)
 print(f"Naive Bayes   train score: {best_bayes_score_train}, test score: {best_bayes_score_test}")
 
-logistic_settings = {'fill_embarked': True, 'fill_age': True, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': True}
+logistic_settings = {'fill_embarked': True, 'fill_age': False, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': True, 'deck_feature': False}
 best_logistic_score_train, best_logistic_score_test = logisticRegression.get_logistic_classifier_score(logistic_settings)
 print(f"Logistic Reg. train score: {best_logistic_score_train}, test score: {best_logistic_score_test}")
 

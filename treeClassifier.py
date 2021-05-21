@@ -23,7 +23,7 @@ def get_tree_classifier_score(settings) -> (float, float):
 def find_best_tree_classifier_score(depth_min, depth_max) -> (float, dict):
     best_test_score = 0.0
     best_settings = None
-    attempt_count = 100
+    attempt_count = 5
 
     for depth in range(depth_min, depth_max + 1):
         print(f"Depth:{depth}")
@@ -35,15 +35,15 @@ def find_best_tree_classifier_score(depth_min, depth_max) -> (float, dict):
             # Prepare DataFrame
             tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
 
-            train_score_sum = 0
+            test_score_sum = 0
             for attempt in range(0, attempt_count):
                 # Get results of classification
                 score_train, score_test = get_data_frame_tree_classifier_score(depth, tbl)
-                train_score_sum += score_train
+                test_score_sum += score_test
 
-            score_train_avg = train_score_sum / attempt_count
-            if best_test_score < score_train_avg:
-                best_test_score = score_train_avg
+            score_test_avg = test_score_sum / attempt_count
+            if best_test_score < score_test_avg:
+                best_test_score = score_test_avg
                 best_settings = settings
                 print(f"Decision tree best configuration: {best_test_score}, settings: {best_settings}")
 
