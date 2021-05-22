@@ -3,7 +3,6 @@ import logisticRegression
 import naiveBayes
 import svmClassifier
 import treeClassifier
-import treeVisualization
 
 # Set seed if it is required to get stable results for debugging
 # np.random.seed(5)
@@ -38,6 +37,9 @@ tree_settings = {'fill_embarked': True, 'fill_age': True, 'fill_fare': True, 'ti
                  'ticket_group_feature': False, 'family_size_feature': False, 'deck_feature': True, 'max_depth': 3}
 tree_score_train, tree_score_test = treeClassifier.get_tree_classifier_score(tree_settings)
 print(f"Decision tree train score: {tree_score_train}, test score: {tree_score_test}")
+# # Visualize decision tree
+# treeClassifier.plot_tree_graphviz(tree_settings)
+# treeClassifier.plot_tree_dteeviz(tree_settings)
 
 bayes_settings = {'fill_embarked': False, 'fill_age': False, 'fill_fare': False, 'title_feature': True,
                   'ticket_group_feature': True, 'family_size_feature': False, 'deck_feature': False}

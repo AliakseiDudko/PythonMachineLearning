@@ -1,3 +1,5 @@
+import dtreeviz
+import graphviz
 import sklearn.tree
 
 import featureEngineering
@@ -49,3 +51,46 @@ def find_best_tree_classifier_score(depth_min, depth_max) -> (float, dict):
                 print(f"Decision tree best configuration: {best_test_score}, settings: {best_settings}")
 
     return best_test_score, best_settings
+
+
+def plot_tree_graphviz(settings):
+    tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
+    train_data, test_data, train_survived_data, test_survived_data = featureEngineering.split_data_frame(tbl)
+
+    tree_classifier = sklearn.tree.DecisionTreeClassifier(max_depth=settings["max_depth"])
+    tree_classifier.fit(train_data, train_survived_data.values.ravel())
+
+    # Draw using graphviz
+    feature_names = ["Age", "Siblings Spouse", "Parent Children", "Fare", "Women", "1st Class",
+                     "2nd Class", "3rd Class", "Cherbourg", "Queenstown", "Southhampton",
+                     "Master", "Miss", "Mister", "Missis", "Other Title",
+                     "Deck A", "Deck B", "Deck C", "Deck D", "Deck E", "Deck F", "Deck G",
+                     "Deck N/A", "Deck T"]
+    dot_data = sklearn.tree.export_graphviz(tree_classifier,
+                                            feature_names=feature_names,
+                                            class_names=["Drowned", "Survived"],
+                                            out_file=None,
+                                            filled=True)
+    graph = graphviz.Source(dot_data, format="svg")
+    graph.render(filename="Titanic_Graphviz")
+
+
+def plot_tree_dteeviz(settings):
+    tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
+    train_data, test_data, train_survived_data, test_survived_data = featureEngineering.split_data_frame(tbl)
+
+    tree_classifier = sklearn.tree.DecisionTreeClassifier(max_depth=settings["max_depth"])
+    tree_classifier.fit(train_data, train_survived_data.values.ravel())
+
+    # Draw using dtreeviz
+    feature_names = ["Age", "Siblings Spouse", "Parent Children", "Fare", "Women", "1st Class",
+                     "2nd Class", "3rd Class", "Cherbourg", "Queenstown", "Southhampton",
+                     "Master", "Miss", "Mister", "Missis", "Other Title",
+                     "Deck A", "Deck B", "Deck C", "Deck D", "Deck E", "Deck F", "Deck G",
+                     "Deck N/A", "Deck T"]
+    viz = dtreeviz.trees.dtreeviz(tree_classifier,
+                                  tbl.drop(["Survived"], axis=1),
+                                  tbl["Survived"],
+                                  feature_names=feature_names,
+                                  class_names=["Drowned", "Survived"])
+    viz.save("Titanic_Dtreeviz.svg")
