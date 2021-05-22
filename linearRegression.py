@@ -1,6 +1,7 @@
 import sklearn.linear_model
 
 import featureEngineering
+import progress
 
 
 def get_data_frame_linear_classifier_score(tbl) -> (float, float):
@@ -24,9 +25,12 @@ def get_linear_classifier_score(settings) -> (float, float):
 def find_best_linear_classifier_score() -> (float, dict):
     best_test_score = 0.0
     best_settings = None
+    variations_count = featureEngineering.get_settings_variations_count()
     attempt_count = 5
 
-    for settings_seed in range(0, featureEngineering.get_settings_variations_count()):
+    progress_log = progress.Progress(variations_count * attempt_count)
+
+    for settings_seed in range(0, variations_count):
         # Get variation of features
         settings = featureEngineering.get_settings_variation(settings_seed)
 
@@ -39,10 +43,11 @@ def find_best_linear_classifier_score() -> (float, dict):
             score_test, score_test = get_data_frame_linear_classifier_score(tbl)
             test_score_sum += score_test
 
+            progress_log.log()
+
         score_test_avg = test_score_sum / attempt_count
         if best_test_score < score_test_avg:
             best_test_score = score_test_avg
             best_settings = settings
-            print(f"Linear regression best configuration: {best_test_score}, settings: {best_settings}")
 
     return best_test_score, best_settings

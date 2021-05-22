@@ -3,6 +3,7 @@ import graphviz
 import sklearn.tree
 
 import featureEngineering
+import progress
 
 
 def get_data_frame_tree_classifier_score(max_depth, tbl) -> (float, float):
@@ -26,11 +27,13 @@ def get_tree_classifier_score(settings) -> (float, float):
 def find_best_tree_classifier_score(depth_min, depth_max) -> (float, dict):
     best_test_score = 0.0
     best_settings = None
+    variations_count = featureEngineering.get_settings_variations_count()
     attempt_count = 5
 
+    progress_log = progress.Progress(variations_count * attempt_count * (depth_max - depth_min + 1))
+
     for depth in range(depth_min, depth_max + 1):
-        print(f"Depth:{depth}")
-        for settings_seed in range(0, featureEngineering.get_settings_variations_count()):
+        for settings_seed in range(0, variations_count):
             # Get variation of features
             settings = featureEngineering.get_settings_variation(settings_seed)
             settings["max_depth"] = depth
@@ -44,11 +47,12 @@ def find_best_tree_classifier_score(depth_min, depth_max) -> (float, dict):
                 score_train, score_test = get_data_frame_tree_classifier_score(depth, tbl)
                 test_score_sum += score_test
 
+                progress_log.log()
+
             score_test_avg = test_score_sum / attempt_count
             if best_test_score < score_test_avg:
                 best_test_score = score_test_avg
                 best_settings = settings
-                print(f"Decision tree best configuration: {best_test_score}, settings: {best_settings}")
 
     return best_test_score, best_settings
 
@@ -61,11 +65,10 @@ def plot_tree_graphviz(settings):
     tree_classifier.fit(train_data, train_survived_data.values.ravel())
 
     # Draw using graphviz
-    feature_names = ["Age", "Siblings Spouse", "Parent Children", "Fare", "Women", "1st Class",
-                     "2nd Class", "3rd Class", "Cherbourg", "Queenstown", "Southhampton",
-                     "Master", "Miss", "Mister", "Missis", "Other Title",
-                     "Deck A", "Deck B", "Deck C", "Deck D", "Deck E", "Deck F", "Deck G",
-                     "Deck N/A", "Deck T"]
+    feature_names = ["Age", "Siblings Spouse", "Parent Children", "Fare", "Women", "1st Class", "2nd Class",
+                     "3rd Class", "Cherbourg", "Queenstown", "Southhampton", "Master", "Miss", "Mister", "Missis",
+                     "Other Title", "Alone", "Big Family", "Middle Family", "Deck A", "Deck B", "Deck C", "Deck D",
+                     "Deck E", "Deck F", "Deck G", "Deck N/A", "Deck T"]
     dot_data = sklearn.tree.export_graphviz(tree_classifier,
                                             feature_names=feature_names,
                                             class_names=["Drowned", "Survived"],
@@ -83,11 +86,10 @@ def plot_tree_dteeviz(settings):
     tree_classifier.fit(train_data, train_survived_data.values.ravel())
 
     # Draw using dtreeviz
-    feature_names = ["Age", "Siblings Spouse", "Parent Children", "Fare", "Women", "1st Class",
-                     "2nd Class", "3rd Class", "Cherbourg", "Queenstown", "Southhampton",
-                     "Master", "Miss", "Mister", "Missis", "Other Title",
-                     "Deck A", "Deck B", "Deck C", "Deck D", "Deck E", "Deck F", "Deck G",
-                     "Deck N/A", "Deck T"]
+    feature_names = ["Age", "Siblings Spouse", "Parent Children", "Fare", "Women", "1st Class", "2nd Class",
+                     "3rd Class", "Cherbourg", "Queenstown", "Southhampton", "Master", "Miss", "Mister", "Missis",
+                     "Other Title", "Alone", "Big Family", "Middle Family", "Deck A", "Deck B", "Deck C", "Deck D",
+                     "Deck E", "Deck F", "Deck G", "Deck N/A", "Deck T"]
     viz = dtreeviz.trees.dtreeviz(tree_classifier,
                                   tbl.drop(["Survived"], axis=1),
                                   tbl["Survived"],
