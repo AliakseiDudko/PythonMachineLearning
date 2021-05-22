@@ -19,5 +19,4 @@ def newton_raphson(f, precision=0.001, dx=0.001, max_iterations=1000):
 
     return x0
 
-
 # print(newton_raphson(square))

@@ -1,6 +1,5 @@
-import numpy as np
-import sklearn
 import pandas as pd
+import sklearn
 from pandas import DataFrame
 
 
