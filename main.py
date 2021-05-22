@@ -1,4 +1,5 @@
 import knnClassifier
+import linearRegression
 import logisticRegression
 import naiveBayes
 import svmClassifier
@@ -26,6 +27,10 @@ import treeClassifier
 # best_svm_score, best_svm_settings = svmClassifier.find_best_svm_classifier_score()
 # print(f"Best SVM           test score: {best_svm_score}, settings: {best_svm_settings}")
 # # Best SVM           test score: 0.841255605381166, settings: {'fill_embarked': True, 'fill_age': False, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': True, 'family_size_feature': False, 'deck_feature': False}
+#
+# best_linear_score, best_linear_settings = linearRegression.find_best_linear_classifier_score()
+# print(f"Best linear reg.   test score: {best_linear_score}, settings: {best_linear_settings}")
+# # Best linear reg.   test score: 0.501584400680018, settings: {'fill_embarked': False, 'fill_age': False, 'fill_fare': False, 'title_feature': True, 'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': False}
 
 
 knn_settings = {'fill_embarked': False, 'fill_age': True, 'fill_fare': True, 'title_feature': True,
@@ -43,19 +48,23 @@ print(f"Decision tree train score: {tree_score_train}, test score: {tree_score_t
 
 bayes_settings = {'fill_embarked': False, 'fill_age': False, 'fill_fare': False, 'title_feature': True,
                   'ticket_group_feature': True, 'family_size_feature': False, 'deck_feature': False}
-best_bayes_score_train, best_bayes_score_test = naiveBayes.get_bayes_classifier_score(bayes_settings)
-print(f"Naive Bayes   train score: {best_bayes_score_train}, test score: {best_bayes_score_test}")
+bayes_score_train, bayes_score_test = naiveBayes.get_bayes_classifier_score(bayes_settings)
+print(f"Naive Bayes   train score: {bayes_score_train}, test score: {bayes_score_test}")
 
 logistic_settings = {'fill_embarked': True, 'fill_age': False, 'fill_fare': False, 'title_feature': True,
                      'ticket_group_feature': True, 'family_size_feature': True, 'deck_feature': False}
-best_logistic_score_train, best_logistic_score_test = logisticRegression.get_logistic_classifier_score(
-    logistic_settings)
-print(f"Logistic Reg. train score: {best_logistic_score_train}, test score: {best_logistic_score_test}")
+logistic_score_train, logistic_score_test = logisticRegression.get_logistic_classifier_score(logistic_settings)
+print(f"Logistic Reg. train score: {logistic_score_train}, test score: {logistic_score_test}")
 
 svm_settings = {'fill_embarked': True, 'fill_age': False, 'fill_fare': False, 'title_feature': True,
                 'ticket_group_feature': True, 'family_size_feature': False, 'deck_feature': False}
-best_svm_score_train, best_svm_score_test = svmClassifier.get_svm_classifier_score(svm_settings)
-print(f"SVM           train score: {best_svm_score_train}, test score: {best_svm_score_test}")
+svm_score_train, svm_score_test = svmClassifier.get_svm_classifier_score(svm_settings)
+print(f"SVM           train score: {svm_score_train}, test score: {svm_score_test}")
+
+linear_settings = {'fill_embarked': False, 'fill_age': False, 'fill_fare': False, 'title_feature': True,
+                   'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': False}
+linear_score_train, linear_score_test = linearRegression.get_linear_classifier_score(linear_settings)
+print(f"Linear Reg.   train score: {linear_score_train}, test score: {linear_score_test}")
 
 # Show Age histogram
 # tbl["Age"].hist()
