@@ -4,7 +4,7 @@ import solution
 
 
 def get_classifier() -> object:
-    return sklearn.ensemble.RandomForestClassifier()
+    return sklearn.ensemble.RandomForestClassifier(class_weight="balanced_subsample", n_jobs=-1)
 
 
 def get_random_forest_classifier_score(settings) -> (float, float):

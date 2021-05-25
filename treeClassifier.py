@@ -2,12 +2,12 @@ import dtreeviz
 import graphviz
 import sklearn.tree
 
-import solution
 import featureEngineering
+import solution
 
 
 def get_classifier(max_depth) -> object:
-    return sklearn.tree.DecisionTreeClassifier(max_depth=max_depth)
+    return sklearn.tree.DecisionTreeClassifier(max_depth=max_depth, class_weight="balanced")
 
 
 def get_tree_classifier_score(settings) -> (float, float):
@@ -21,7 +21,9 @@ def find_best_tree_classifier_score(depth_min, depth_max) -> (float, dict):
     best_test_score = 0.0
     best_settings = None
 
-    for depth in range(depth_min, depth_max + 1):
+    depths = list(range(depth_min, depth_max + 1))
+    depths.append(None)
+    for depth in depths:
         print(f"Depth={depth} ", end="")
 
         tree_classifier = get_classifier(depth)

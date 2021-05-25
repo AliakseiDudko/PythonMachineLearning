@@ -6,7 +6,7 @@ base_settings = {"normalize": True}
 
 
 def get_classifier() -> object:
-    return sklearn.svm.SVC(kernel="poly")
+    return sklearn.svm.SVC(kernel="poly", class_weight="balanced")
 
 
 def get_svm_classifier_score(settings) -> (float, float):

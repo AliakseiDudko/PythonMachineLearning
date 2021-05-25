@@ -4,7 +4,7 @@ import solution
 
 
 def get_classifier() -> object:
-    return sklearn.linear_model.LinearRegression(normalize=True)
+    return sklearn.linear_model.LinearRegression(n_jobs=-1)
 
 
 def get_linear_classifier_score(settings) -> (float, float):

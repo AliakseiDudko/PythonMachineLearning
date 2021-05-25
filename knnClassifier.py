@@ -6,7 +6,7 @@ base_settings = {"normalize": True}
 
 
 def get_classifier() -> object:
-    return sklearn.neighbors.NearestCentroid()
+    return sklearn.neighbors.KNeighborsClassifier(n_neighbors=5, weights="distance", n_jobs=-1)
 
 
 def get_knn_classifier_score(settings) -> (float, float):
