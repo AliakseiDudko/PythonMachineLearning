@@ -2,6 +2,7 @@ import knnClassifier
 import linearRegression
 import logisticRegression
 import naiveBayes
+import randomForest
 import svmClassifier
 import treeClassifier
 
@@ -52,6 +53,13 @@ linear_settings = {'fill_embarked': True, 'fill_age': True, 'fill_fare': True, '
                    'ticket_group_feature': True, 'family_size_feature': True, 'deck_feature': False}
 linear_score_train, linear_score_test = linearRegression.get_linear_classifier_score(linear_settings)
 print(f"Linear Reg.   train score: {linear_score_train}, test score: {linear_score_test}")
+
+# best_random_forest_score, best_random_forest_settings = randomForest.find_best_random_forest_classifier_score()
+# print(f"Best random forest : {best_random_forest_score}, settings: {best_random_forest_settings}")
+random_forest_settings = {'fill_embarked': True, 'fill_age': False, 'fill_fare': False, 'title_feature': True,
+                          'ticket_group_feature': False, 'family_size_feature': True, 'deck_feature': False}
+random_forest_score_train, random_forest_score_test = randomForest.get_random_forest_classifier_score(random_forest_settings)
+print(f"Random forest train score: {random_forest_score_train}, test score: {random_forest_score_test}")
 
 # Show Age histogram
 # tbl["Age"].hist()
