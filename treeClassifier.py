@@ -2,63 +2,41 @@ import dtreeviz
 import graphviz
 import sklearn.tree
 
+import solution
 import featureEngineering
-import progress
 
 
-def get_data_frame_tree_classifier_score(max_depth, tbl) -> (float, float):
-    train_data, test_data, train_survived_data, test_survived_data = featureEngineering.split_data_frame(tbl)
-
-    tree_classifier = sklearn.tree.DecisionTreeClassifier(max_depth=max_depth)
-    tree_classifier.fit(train_data, train_survived_data.values.ravel())
-    score_train = tree_classifier.score(train_data, train_survived_data)
-    score_test = tree_classifier.score(test_data, test_survived_data)
-
-    return score_train, score_test
+def get_classifier(max_depth) -> object:
+    return sklearn.tree.DecisionTreeClassifier(max_depth=max_depth)
 
 
 def get_tree_classifier_score(settings) -> (float, float):
-    # Prepare DataFrame
-    tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
+    tree_classifier = get_classifier(settings["max_depth"])
+    score_train, score_test = solution.get_classifier_score(tree_classifier, settings)
 
-    return get_data_frame_tree_classifier_score(settings["max_depth"], tbl)
+    return score_train, score_test
 
 
 def find_best_tree_classifier_score(depth_min, depth_max) -> (float, dict):
     best_test_score = 0.0
     best_settings = None
-    variations_count = featureEngineering.get_settings_variations_count()
-    attempt_count = 5
-
-    progress_log = progress.Progress(variations_count * attempt_count * (depth_max - depth_min + 1))
 
     for depth in range(depth_min, depth_max + 1):
-        for settings_seed in range(0, variations_count):
-            # Get variation of features
-            settings = featureEngineering.get_settings_variation(settings_seed)
-            settings["max_depth"] = depth
+        print(f"Depth={depth} ", end="")
 
-            # Prepare DataFrame
-            tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
+        tree_classifier = get_classifier(depth)
+        current_best_test_score, current_best_settings = solution.find_best_classifier_score(tree_classifier)
 
-            test_score_sum = 0
-            for attempt in range(0, attempt_count):
-                # Get results of classification
-                score_train, score_test = get_data_frame_tree_classifier_score(depth, tbl)
-                test_score_sum += score_test
-
-                progress_log.log()
-
-            score_test_avg = test_score_sum / attempt_count
-            if best_test_score < score_test_avg:
-                best_test_score = score_test_avg
-                best_settings = settings
+        if best_test_score < current_best_test_score:
+            best_test_score = current_best_test_score
+            best_settings = current_best_settings
+            best_settings["max_depth"] = depth
 
     return best_test_score, best_settings
 
 
 def plot_tree_graphviz(settings):
-    tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
+    tbl = featureEngineering.get_featured_data_frame(settings)
     train_data, test_data, train_survived_data, test_survived_data = featureEngineering.split_data_frame(tbl)
 
     tree_classifier = sklearn.tree.DecisionTreeClassifier(max_depth=settings["max_depth"])
@@ -79,7 +57,7 @@ def plot_tree_graphviz(settings):
 
 
 def plot_tree_dteeviz(settings):
-    tbl = featureEngineering.get_featured_data_frame("data.csv", settings)
+    tbl = featureEngineering.get_featured_data_frame(settings)
     train_data, test_data, train_survived_data, test_survived_data = featureEngineering.split_data_frame(tbl)
 
     tree_classifier = sklearn.tree.DecisionTreeClassifier(max_depth=settings["max_depth"])

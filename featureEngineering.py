@@ -3,11 +3,9 @@ import sklearn
 from pandas import DataFrame
 
 
-def get_featured_data_frame(file_name,
-                            settings,
-                            normalize=False):
+def get_featured_data_frame(settings):
     # Read data to DataFrame
-    tbl = pd.read_csv(file_name)
+    tbl = pd.read_csv("data.csv")
 
     # Fill missing Embarked with the most frequent value
     if settings["fill_embarked"]:
@@ -67,6 +65,7 @@ def get_featured_data_frame(file_name,
     tbl = tbl.drop(["PassengerId", "Name", "Ticket", "Cabin", "Sex_male"], axis=1)
 
     # Normalize columns
+    normalize = settings.get("Normalize", False)
     if normalize:
         tbl = ((tbl - tbl.min()) / (tbl.max() - tbl.min()))
 
