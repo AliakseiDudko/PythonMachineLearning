@@ -2,7 +2,7 @@ import sklearn.svm
 
 import solution
 
-base_settings = {"Normalize": True}
+base_settings = {"normalize": True}
 
 
 def get_classifier() -> object:

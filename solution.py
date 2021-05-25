@@ -17,7 +17,7 @@ def find_best_classifier_score(classifier, base_settings=None) -> (float, dict):
     best_test_score = 0.0
     best_settings = None
     variations_count = featureEngineering.get_settings_variations_count()
-    attempt_count = 1
+    attempt_count = 3
 
     progress_log = progress.Progress(variations_count * attempt_count)
 
