@@ -13,7 +13,7 @@ def get_featured_data_frame(settings):
     family_size_feature = settings.get("family_size_feature", False)
     deck_feature = settings.get("deck_feature", False)
     drop_male = settings.get("drop_male", False)
-    drop_age = settings.get("drop_age", False)
+    drop_age = ~fill_age & settings.get("drop_age", False)
     drop_sibsp_parch = settings.get("drop_sibsp_parch", False)
     normalize = settings.get("normalize", False)
 
@@ -66,22 +66,25 @@ def get_featured_data_frame(settings):
     tbl = tbl.fillna(0)
 
     # Build dummy columns
-    tbl = pd.get_dummies(tbl, columns=["Sex", "Pclass", "Embarked"], drop_first=False)
+    columns_to_dummy = ["Sex", "Pclass", "Embarked"]
     if title_feature:
-        tbl = pd.get_dummies(tbl, columns=["Title"], drop_first=False)
+        columns_to_dummy.append("Title")
     if family_size_feature:
-        tbl = pd.get_dummies(tbl, columns=["FamilySize"], drop_first=False)
+        columns_to_dummy.append("FamilySize")
     if deck_feature:
-        tbl = pd.get_dummies(tbl, columns=["Deck"], drop_first=False)
+        columns_to_dummy.append("Deck")
+    tbl = pd.get_dummies(tbl, columns=columns_to_dummy, drop_first=False)
 
     # Drop extra columns
-    tbl = tbl.drop(["PassengerId", "Name", "Ticket", "Cabin"], axis=1)
+    columns_to_drop = ["PassengerId", "Name", "Ticket", "Cabin"]
     if drop_male:
-        tbl = tbl.drop(["Sex_male"], axis=1)
+        columns_to_drop.append("Sex_male")
     if drop_age:
-        tbl = tbl.drop(["Age"], axis=1)
+        columns_to_drop.append("Age")
     if drop_sibsp_parch:
-        tbl = tbl.drop(["SibSp", "Parch"], axis=1)
+        columns_to_drop.append("SibSp")
+        columns_to_drop.append("Parch")
+    tbl = tbl.drop(columns_to_drop, axis=1)
 
     # Normalize columns
     if normalize:
