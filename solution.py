@@ -14,33 +14,55 @@ def get_classifier_score(classifier, settings=None) -> (float, float):
 
 
 def find_best_classifier_score(classifier, base_settings=None) -> (float, dict):
-    best_test_score = 0.0
-    best_settings = None
     variations_count = featureEngineering.get_settings_variations_count()
-    attempt_count = 3
-
+    attempt_count = 10
     progress_log = progress.Progress(variations_count * attempt_count)
 
+    results = list()
     for settings_seed in range(0, variations_count):
         settings = featureEngineering.get_settings_variation(settings_seed)
         if base_settings is not None:
             settings = base_settings | settings
 
-        tbl = featureEngineering.get_featured_data_frame(settings)
+        avg_test_score = get_avg_test_score(classifier, settings, attempt_count, progress_log)
+        results.append((avg_test_score, settings))
+    best_settings = get_best_settings(results)
 
-        test_score_sum = 0
-        for attempt in range(0, attempt_count):
-            train_data, test_data, train_survived_data, test_survived_data = featureEngineering.split_data_frame(tbl)
-            classifier.fit(train_data, train_survived_data.values.ravel())
+    return results[0][0], best_settings
 
-            score_test = classifier.score(test_data, test_survived_data)
-            test_score_sum += score_test
 
-            progress_log.log()
+def get_avg_test_score(classifier, settings, attempt_count, progress_log) -> float:
+    tbl = featureEngineering.get_featured_data_frame(settings)
+    sum_test_score = 0
+    for attempt in range(0, attempt_count):
+        train_data, test_data, train_survived_data, test_survived_data = featureEngineering.split_data_frame(tbl)
+        classifier.fit(train_data, train_survived_data.values.ravel())
 
-        score_test_avg = test_score_sum / attempt_count
-        if best_test_score < score_test_avg:
-            best_test_score = score_test_avg
-            best_settings = settings
+        score_test = classifier.score(test_data, test_survived_data)
+        sum_test_score += score_test
 
-    return best_test_score, best_settings
+        progress_log.log()
+
+    avg_test_score = sum_test_score / attempt_count
+
+    return avg_test_score
+
+
+def get_best_settings(results) -> object:
+    results.sort(key=lambda x: x[0], reverse=True)
+    low_test_score = results[0][0] * 0.95
+    results = list(filter(lambda x: x[0] >= low_test_score, results))
+
+    settings = featureEngineering.get_settings_variation(0)
+    for setting_key in settings:
+        true_count = 0
+        false_count = 0
+        for result in results:
+            if result[1][setting_key]:
+                true_count += 1
+            else:
+                false_count += 1
+
+        settings[setting_key] = true_count >= false_count
+
+    return settings
