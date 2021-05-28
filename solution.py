@@ -2,7 +2,7 @@ import featureEngineering
 import progress
 
 
-def get_classifier_score(classifier, settings=None) -> (float, float):
+def get_classifier_score(classifier, settings={}) -> (float, float):
     tbl = featureEngineering.get_featured_data_frame(settings)
     train_data, test_data, train_survived_data, test_survived_data = featureEngineering.split_data_frame(tbl)
 
@@ -13,17 +13,14 @@ def get_classifier_score(classifier, settings=None) -> (float, float):
     return score_train, score_test
 
 
-def find_best_classifier_score(classifier, base_settings=None) -> (float, dict):
+def find_best_classifier_score(classifier, base_settings={}) -> (float, dict):
     variations_count = featureEngineering.get_settings_variations_count()
     attempt_count = 10
     progress_log = progress.Progress(variations_count * attempt_count)
 
     results = list()
     for settings_seed in range(0, variations_count):
-        settings = featureEngineering.get_settings_variation(settings_seed)
-        if base_settings is not None:
-            settings = base_settings | settings
-
+        settings = base_settings | featureEngineering.get_settings_variation(settings_seed)
         avg_test_score = get_avg_test_score(classifier, settings, attempt_count, progress_log)
         results.append((avg_test_score, settings))
     best_settings = get_best_settings(results)

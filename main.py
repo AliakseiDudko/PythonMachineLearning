@@ -5,6 +5,7 @@ import naiveBayes
 import randomForest
 import svmClassifier
 import treeClassifier
+import votingClassifier
 
 # Set seed if it is required to get stable results for debugging
 # np.random.seed(5)
@@ -68,6 +69,9 @@ random_forest_settings = {'fill_embarked': True, 'fill_age': True, 'fill_fare': 
 random_forest_score_train, random_forest_score_test = randomForest.get_random_forest_classifier_score(
     random_forest_settings)
 print(f"Random forest train score: {random_forest_score_train}, test score: {random_forest_score_test}")
+
+voting_score_train, voting_score_test = votingClassifier.get_voting_classifier_score()
+print(f"Voting        train score: {voting_score_train}, test score: {voting_score_test}")
 
 # Show Age histogram
 # tbl["Age"].hist()
